@@ -30,7 +30,7 @@ class AirOctopus:
         banner += '   /_/   \_\_|_|   \___/ \___|\__\___/| .__/ \__,_|___/\n'
         banner += '                                      |_|              \n'
         banner += '\n\n'
-        self.helper.output_text(banner)
+        self.helper.print_text(banner)
 
 
 @click.command()
@@ -38,9 +38,7 @@ class AirOctopus:
 def run_app(verbose):
     params = AppData()
     params.isVerbose = verbose
-
     my_app = AirOctopus(params)
-
     my_app.start()
 
 
