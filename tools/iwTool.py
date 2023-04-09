@@ -3,9 +3,9 @@ from util.helper import Helper
 
 
 class IwTool:
-    def __init__(self, params: AppData):
-        self.appData = params
-        self.helper = Helper(params)
+    def __init__(self, app_data: AppData):
+        self.appData = app_data
+        self.helper = Helper(app_data)
 
     def enable_mode_monitor(self, iface):
         command = ['sudo', 'iw', iface, 'set', 'type', 'monitor']
