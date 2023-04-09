@@ -1,58 +1,34 @@
 #!/usr/bin/env python3
-import sys
-
 import click
-import os
-import platform
 
-from main.AppData import AppData
-from util.StringUtils import StringUtils
+from main.appData import AppData
+from tools import ipTool, iwTool, iwconfigTool
+from util.osUtils import OsUtils
 
 
 class AirOctopus:
-    __appName = "AirOctopus"
-    __appVersion = "0.0.1"
-
     def __init__(self, params: AppData):
-        self.params = params
+        self.appData = params
+        self.ipTool = ipTool.IpTool(params)
+        self.iwTool = iwTool.IwTool(params)
+        self.iwconfigTool = iwconfigTool.IwconfigTool(params)
+        self.osUtils = OsUtils(params)
 
     def start(self):
         self.print_leet_banner()
-        self.check_platform()
-        self.check_privileges()
-
-        # Mock the use of the parameters to process something
-        # print(f"Processing {self.params.required_param_1} with {self.params.required_param_2} and optional param 1 = {self.params.optional_param_1} and optional param 2 = {self.params.optional_param_2}")
+        self.osUtils.check_platform()
+        self.osUtils.check_privileges()
 
     @staticmethod
     def print_leet_banner():
-        print("\n\n")
-        print("       _    _       ___       _                        ")
-        print("      / \  (_)_ __ / _ \  ___| |_ ___  _ __  _   _ ___ ")
+        print('\n\n')
+        print('       _    _       ___       _                        ')
+        print('      / \  (_)_ __ / _ \  ___| |_ ___  _ __  _   _ ___ ')
         print("     / _ \ | | '__| | | |/ __| __/ _ \| '_ \| | | / __|")
-        print("    / ___ \| | |  | |_| | (__| || (_) | |_) | |_| \__ \\")
-        print("   /_/   \_\_|_|   \___/ \___|\__\___/| .__/ \__,_|___/")
-        print("                                      |_|              ")
-        print("\n\n")
-
-    def check_platform(self):
-        system = platform.system()
-        if StringUtils.equals_ignore_case(system, "Linux"):
-            if StringUtils.contains_ignore_case("Microsoft", platform.release()):
-                print("Keep in mind that", self.__appName, "was not tested under WSL.")
-            else:
-                print(self.__appName, "is running under *Unix... good.")
-        elif StringUtils.equals_ignore_case(system, "Windows"):
-            print(self.__appName, "is running under Windows. This is not a really smart idea.")
-            sys.exit(0)
-        else:
-            print("Unknown operating system detected. Bye.")
-            sys.exit(0)
-
-    def check_privileges(self):
-        if os.geteuid() != 0:
-            print("Information:", self.__appName, "is not running as root.\nYou will be asked for a password when privileges are needed.")
-            sys.exit(0)
+        print('    / ___ \| | |  | |_| | (__| || (_) | |_) | |_| \__ \\')
+        print('   /_/   \_\_|_|   \___/ \___|\__\___/| .__/ \__,_|___/')
+        print('                                      |_|              ')
+        print('\n\n')
 
 
 @click.command()
