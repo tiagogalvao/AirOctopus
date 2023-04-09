@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class AppData:
     appName = 'AirOctopus'
     appVersion = '0.0.1'
+    isVerbose = False
 
     # required_param_1: str
     # required_param_2: int

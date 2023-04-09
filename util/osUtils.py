@@ -26,5 +26,7 @@ class OsUtils:
 
     def check_privileges(self):
         if os.geteuid() != 0:
-            print('Information:', self.appData.appName, 'is not running as root.')
+            print('Information:', self.appData.appName, 'is not running as root. Good.')
             print('You will be asked for a password when privileges are needed.')
+        else:
+            print("You don't need to run this as root ;)")

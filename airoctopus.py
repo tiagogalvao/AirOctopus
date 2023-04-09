@@ -32,9 +32,11 @@ class AirOctopus:
 
 
 @click.command()
-def run_app():
+@click.option('--verbose', '-v', is_flag=True, help='Enable verbose mode')
+def run_app(verbose):
     # Create an instance of the AppParams dataclass
     params = AppData()
+    params.isVerbose = verbose
 
     # Create an instance of the MyApp class with the AppParams dataclass instance as a parameter
     my_app = AirOctopus(params)

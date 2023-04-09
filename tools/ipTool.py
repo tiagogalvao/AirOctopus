@@ -1,18 +1,16 @@
-import subprocess
-
 from main.appData import AppData
+from util.helper import Helper
 
 
 class IpTool:
     def __init__(self, params: AppData):
         self.appData = params
+        self.helper = Helper(params)
 
     def set_iface_up(self, iface):
-        print('sudo ip link set wlan1 up')
         command = ['sudo', 'ip', 'link', 'set', iface, 'up']
-        subprocess.run(command)
+        self.helper.execute_command(command)
 
     def set_iface_down(self, iface):
-        print('sudo ip link set wlan1 down')
         command = ['sudo', 'ip', 'link', 'set', iface, 'down']
-        subprocess.run(command)
+        self.helper.execute_command(command)
