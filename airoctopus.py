@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 import atexit
 import click
+import re
 import signal
+import sys
 
+from main.appContext import AppContext
 from main.appOptions import AppOptions
 from main.appSettings import AppSettings
 from main.wifiInterface import WifiInterface
@@ -19,6 +22,7 @@ class AirOctopus:
         atexit.register(self.exit_gracefully)
 
         # Main initialization
+        self.app_context = AppContext()
         self.app_options = options
         self.app_settings = AppSettings()
         self.helper = Helper(self.app_options, self.app_settings)
@@ -37,10 +41,9 @@ class AirOctopus:
         self.os_utils.check_privileges()
         self.print_interface_selection()
 
-        iface1 = WifiInterface(self.app_options, self.helper, self.ip_tool, self.iw_tool, self.iwconfig_tool)
-        iface1.Name = 'wlan1'
-        iface1.enable_mode_monitor()
-        iface1.disable_mode_monitor()
+        if len(self.app_context.iface_selected_wifi_interfaces) > 0:
+            for iface in self.app_context.iface_selected_wifi_interfaces:
+                iface.enable_mode_monitor()
 
     def print_leet_banner(self):
         banner = '\n&30&01'
@@ -54,19 +57,45 @@ class AirOctopus:
         self.helper.print_text(banner)
 
     def print_interface_selection(self):
-        interfaces = self.query_interfaces()
-        for iface in interfaces:
-            print(iface)
+        self.query_interfaces_and_store_data()
+        if len(self.app_context.iface_system_wifi_interfaces) > 0:
+            self.helper.print_text('Available interfaces:')
+            for index, item in enumerate(self.app_context.iface_system_wifi_interfaces):
+                self.helper.print_text(f'{index}: {item.Name}')
 
-    def query_interfaces(self):
+            selection = input(f'\nSelect from [1-{len(self.app_context.iface_system_wifi_interfaces)}]'
+                              f', using comma-separated input: ')
+            if re.match(r'^[\d,]+$', selection):
+                numbers = [int(x) for x in selection.split(',')]
+                for n in numbers:
+                    self.app_context.iface_selected_wifi_interfaces\
+                        .append(self.app_context.iface_system_wifi_interfaces[n])
+            elif len(selection) < 1:
+                self.helper.print_text('No wireless interfaces have been selected.')
+                sys.exit(0)
+            else:
+                self.helper.print_text('Invalid selection. Please, use only comma-separated numbers.')
+                sys.exit(0)
+        else:
+            self.helper.print_text('No wireless interfaces have been found.')
+            sys.exit(0)
+
+    def query_interfaces_and_store_data(self):
         if self.app_options.use_iwconfig:
             interfaces = self.iwconfig_tool.list_interfaces()
         else:
             interfaces = self.iw_tool.list_interfaces()
-        return interfaces
+
+        for interface in interfaces:
+            iface = WifiInterface(self.app_options, self.helper, self.ip_tool, self.iw_tool, self.iwconfig_tool)
+            iface.Name = interface
+            self.app_context.iface_system_wifi_interfaces.append(iface)
 
     def exit_gracefully(self, signum=None, frame=None):
-        self.helper.print_text('Shutting down gracefully...', 'Sig:', signum, 'Frame:', frame)
+        self.helper.print_text('\nShutting down gracefully...', 'Sig:', signum, 'Frame:', frame)
+        if len(self.app_context.iface_selected_wifi_interfaces) > 0:
+            for iface in self.app_context.iface_selected_wifi_interfaces:
+                iface.disable_mode_monitor()
 
 
 @click.command()
