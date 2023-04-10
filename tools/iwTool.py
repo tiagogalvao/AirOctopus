@@ -1,12 +1,10 @@
 import re
 
-from main.appOptions import AppOptions
 from util.helper import Helper
 
 
 class IwTool:
-    def __init__(self, options: AppOptions, helper: Helper):
-        self.appOptions = options
+    def __init__(self, helper: Helper):
         self.helper = helper
 
     def disable_mode_monitor(self, iface):
