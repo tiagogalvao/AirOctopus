@@ -7,4 +7,5 @@ class AppOptions:
     is_verbose = False
 
     # HW Interface Options
+    iface_keep_monitor = False
     use_iwconfig = False

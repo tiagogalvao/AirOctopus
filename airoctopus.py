@@ -100,17 +100,20 @@ class AirOctopus:
 
     def exit_gracefully(self, signum=None, frame=None):
         self.helper.print_text_warning('Shutting down gracefully... please wait.')
-        if len(self.app_context.iface_selected_wifi_interfaces) > 0:
-            for iface in self.app_context.iface_selected_wifi_interfaces:
-                iface.disable_mode_monitor()
+        if not self.app_options.iface_keep_monitor:
+            if len(self.app_context.iface_selected_wifi_interfaces) > 0:
+                for iface in self.app_context.iface_selected_wifi_interfaces:
+                    iface.disable_mode_monitor()
 
 
 @click.command()
+@click.option('--keep-monitor', is_flag=True, help='Keep interfaces in monitor-mode after quitting')
 @click.option('--use-iwconfig', is_flag=True, help='Force the use of iwconfig instead of iw')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose mode')
-def run_app(use_iwconfig, verbose):
+def run_app(keep_monitor, use_iwconfig, verbose):
     options = AppOptions()
     options.is_verbose = verbose
+    options.iface_keep_monitor = keep_monitor
     options.use_iwconfig = use_iwconfig
 
     octopus = AirOctopus(options)
