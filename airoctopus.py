@@ -2,7 +2,6 @@
 import atexit
 import click
 import re
-import signal
 import sys
 
 from main.appContext import AppContext
@@ -16,9 +15,7 @@ from util.osUtils import OsUtils
 
 class AirOctopus:
     def __init__(self, options: AppOptions):
-        # Registering exit events
-        signal.signal(signal.SIGTERM, self.exit_gracefully)
-        signal.signal(signal.SIGINT, self.exit_gracefully)
+        # Registering exit event
         atexit.register(self.exit_gracefully)
 
         # Main initialization
@@ -36,17 +33,26 @@ class AirOctopus:
         self.os_utils = OsUtils(self.app_settings, self.helper)
 
     def start(self):
-        self.print_leet_banner()
-        self.os_utils.check_platform()
-        self.os_utils.check_privileges()
-        self.print_interface_selection()
+        try:
+            self.print_leet_banner()
+            self.os_utils.check_platform()
+            self.os_utils.check_privileges()
+            self.print_interface_selection()
 
-        if len(self.app_context.iface_selected_wifi_interfaces) > 0:
-            for iface in self.app_context.iface_selected_wifi_interfaces:
-                iface.enable_mode_monitor()
+            if len(self.app_context.iface_selected_wifi_interfaces) > 0:
+                for iface in self.app_context.iface_selected_wifi_interfaces:
+                    iface.enable_mode_monitor()
+        except KeyboardInterrupt:
+            print('\n')
+            self.helper.print_text_warning(self.app_settings.app_name, 'has been aborted.')
+        except Exception as e:
+            print('')
+            self.helper.print_text_error(e)
+        finally:
+            print('')
 
     def print_leet_banner(self):
-        banner = '\n&30&01'
+        banner = '&30&01\n\n'
         banner += '       _    _       ___       _                        \n'
         banner += '      / \\  (_)_ __ / _ \\  ___| |_ ___  _ __  _   _ ___ \n'
         banner += "     / _ \\ | | '__| | | |/ __| __/ _ \\| '_ \\| | | / __|\n"
@@ -59,25 +65,26 @@ class AirOctopus:
     def print_interface_selection(self):
         self.query_interfaces_and_store_data()
         if len(self.app_context.iface_system_wifi_interfaces) > 0:
-            self.helper.print_text('Available interfaces:')
+            self.helper.print_text('\nAvailable interfaces:')
             for index, item in enumerate(self.app_context.iface_system_wifi_interfaces):
                 self.helper.print_text(f'{index}: {item.Name}')
 
-            selection = input(f'\nSelect from [1-{len(self.app_context.iface_system_wifi_interfaces)}]'
+            selection = input(f'\n  Select from [1-{len(self.app_context.iface_system_wifi_interfaces)}]'
                               f', using comma-separated input: ')
             if re.match(r'^[\d,]+$', selection):
                 numbers = [int(x) for x in selection.split(',')]
                 for n in numbers:
-                    self.app_context.iface_selected_wifi_interfaces\
-                        .append(self.app_context.iface_system_wifi_interfaces[n])
+                    if n < len(self.app_context.iface_system_wifi_interfaces):
+                        self.app_context.iface_selected_wifi_interfaces\
+                            .append(self.app_context.iface_system_wifi_interfaces[n])
             elif len(selection) < 1:
-                self.helper.print_text('No wireless interfaces have been selected.')
+                self.helper.print_text_information('\nNo wireless interfaces have been selected.')
                 sys.exit(0)
             else:
-                self.helper.print_text('Invalid selection. Please, use only comma-separated numbers.')
+                self.helper.print_text_warning('\nInvalid selection. Please, use only comma-separated numbers.')
                 sys.exit(0)
         else:
-            self.helper.print_text('No wireless interfaces have been found.')
+            self.helper.print_text_information('\nNo wireless interfaces have been found.')
             sys.exit(0)
 
     def query_interfaces_and_store_data(self):
@@ -92,7 +99,7 @@ class AirOctopus:
             self.app_context.iface_system_wifi_interfaces.append(iface)
 
     def exit_gracefully(self, signum=None, frame=None):
-        self.helper.print_text('\nShutting down gracefully...', 'Sig:', signum, 'Frame:', frame)
+        self.helper.print_text_warning('Shutting down gracefully... please wait.')
         if len(self.app_context.iface_selected_wifi_interfaces) > 0:
             for iface in self.app_context.iface_selected_wifi_interfaces:
                 iface.disable_mode_monitor()

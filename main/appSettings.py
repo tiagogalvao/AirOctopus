@@ -26,7 +26,8 @@ class AppSettings:
     font_switches = {'&30': fs_black, '&31': fs_red, '&32': fs_green,
                      '&33': fs_yellow, '&34': fs_blue, '&35': fs_magenta,
                      '&36': fs_cyan, '&37': fs_white, '&40': fs_reset_all,
-                     '&01': fs_bold, '&02': fs_normal, '&10': fs_reset}
+                     '&01': fs_bold, '&02': fs_normal, '&10': fs_reset,
+                     '\n': '\n  '}
 
     def __init__(self):
         colorama.init()
