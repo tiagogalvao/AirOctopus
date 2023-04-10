@@ -1,13 +1,13 @@
 import re
 
-from main.appData import AppData
+from main.appOptions import AppOptions
 from util.helper import Helper
 
 
 class IwconfigTool:
-    def __init__(self, app_data: AppData):
-        self.appData = app_data
-        self.helper = Helper(app_data)
+    def __init__(self, options: AppOptions, helper: Helper):
+        self.appOptions = options
+        self.helper = helper
 
     def disable_mode_monitor(self, iface):
         command = ['sudo', 'iwconfig', iface, 'mode', 'managed']

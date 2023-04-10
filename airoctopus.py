@@ -3,31 +3,38 @@ import atexit
 import click
 import signal
 
-from main.appData import AppData
+from main.appOptions import AppOptions
 from tools import ipTool, iwTool, iwconfigTool
 from util.helper import Helper
 from util.osUtils import OsUtils
 
+from main.wifiInterface import WifiInterface
+
 
 class AirOctopus:
-    def __init__(self, app_data: AppData):
+    def __init__(self, options: AppOptions):
         # Registering exit events
         signal.signal(signal.SIGTERM, self.exit_gracefully)
         signal.signal(signal.SIGINT, self.exit_gracefully)
         atexit.register(self.exit_gracefully)
 
         # Starting/Loading things
-        self.appData = app_data
-        self.helper = Helper(app_data)
-        self.ipTool = ipTool.IpTool(app_data)
-        self.iwTool = iwTool.IwTool(app_data)
-        self.iwconfigTool = iwconfigTool.IwconfigTool(app_data)
-        self.osUtils = OsUtils(app_data, self.helper)
+        self.appOptions = options
+        self.helper = Helper(options)
+        self.ipTool = ipTool.IpTool(options, self.helper)
+        self.iwTool = iwTool.IwTool(options, self.helper)
+        self.iwconfigTool = iwconfigTool.IwconfigTool(options, self.helper)
+        self.osUtils = OsUtils(options, self.helper)
 
     def start(self):
         self.print_leet_banner()
         self.osUtils.check_platform()
         self.osUtils.check_privileges()
+
+        iface1 = WifiInterface(self.appOptions, self.helper, self.ipTool, self.iwTool, self.iwconfigTool)
+        iface1.Name = 'wlan1'
+        iface1.enable_mode_monitor()
+        iface1.disable_mode_monitor()
 
     def print_leet_banner(self):
         banner = '\n\n&30&01'
@@ -45,10 +52,13 @@ class AirOctopus:
 
 
 @click.command()
+@click.option('--use-iwconfig', is_flag=True, help='Force the use of iwconfig instead of iw')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose mode')
-def run_app(verbose):
-    params = AppData()
+def run_app(use_iwconfig, verbose):
+    params = AppOptions()
     params.isVerbose = verbose
+    params.useIwconfig = use_iwconfig
+
     my_app = AirOctopus(params)
     my_app.start()
 

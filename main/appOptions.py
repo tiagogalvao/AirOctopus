@@ -3,13 +3,16 @@ import colorama
 
 
 @dataclass
-class AppData:
+class AppOptions:
     # BASIC INFO
     appName = 'AirOctopus'
     appVersion = '0.0.1'
 
     # OPTIONS
     isVerbose = False
+
+    # HW Interface Options
+    useIwconfig = False
 
     # FONT STYLING
     fs_black = colorama.Fore.LIGHTBLACK_EX
