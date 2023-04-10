@@ -21,7 +21,7 @@ class Helper:
 
     def print_text(self, *text):
         separator = ' '
-        text = separator.join(text) + '&10&40'
+        text = separator.join([word for word in text if word is not None]) + '&10&40'
         for switch, value in self.appData.font_switches.items():
             text = text.replace(switch, value)
         print(text)

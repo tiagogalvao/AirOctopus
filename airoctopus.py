@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import atexit
 import click
+import signal
 
 from main.appData import AppData
 from tools import ipTool, iwTool, iwconfigTool
@@ -9,6 +11,12 @@ from util.osUtils import OsUtils
 
 class AirOctopus:
     def __init__(self, app_data: AppData):
+        # Registering exit events
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        atexit.register(self.exit_gracefully)
+
+        # Starting/Loading things
         self.appData = app_data
         self.helper = Helper(app_data)
         self.ipTool = ipTool.IpTool(app_data)
@@ -32,6 +40,9 @@ class AirOctopus:
         banner += '\n\n'
         self.helper.print_text(banner)
 
+    def exit_gracefully(self, signum=None, frame=None):
+        self.helper.print_text('Shutting down gracefully...', 'Sig:', signum, 'Frame:', frame)
+
 
 @click.command()
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose mode')
@@ -43,4 +54,5 @@ def run_app(verbose):
 
 
 if __name__ == '__main__':
+    # Start octopus
     run_app()
