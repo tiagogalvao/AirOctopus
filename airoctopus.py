@@ -30,13 +30,14 @@ class AirOctopus:
         self.iwconfig_tool = iwconfigTool.IwconfigTool(self.helper)
 
         # Utils initialization
-        self.os_utils = OsUtils(self.app_settings, self.helper)
+        self.os_utils = OsUtils(self.app_context, self.app_settings, self.helper)
 
     def start(self):
         try:
             self.print_leet_banner()
             self.os_utils.check_platform()
             self.os_utils.check_privileges()
+            self.os_utils.preload_system_data()
             self.print_interface_selection()
 
             if len(self.app_context.iface_selected_wifi_interfaces) > 0:
@@ -45,9 +46,10 @@ class AirOctopus:
         except KeyboardInterrupt:
             print('\n')
             self.helper.print_text_warning(self.app_settings.app_name, 'has been aborted.')
-        # except Exception as e:
-        #     print('')
-        #     self.helper.print_text_error(e)
+        except Exception as e:
+            print('')
+            if not self.app_options.is_verbose:
+                self.helper.print_text_error(e)
         finally:
             print('')
 
@@ -78,13 +80,16 @@ class AirOctopus:
                         self.app_context.iface_selected_wifi_interfaces\
                             .append(self.app_context.iface_system_wifi_interfaces[n-1])
             elif len(selection) < 1:
-                self.helper.print_text_information('\nNo wireless interfaces have been selected.')
+                print()
+                self.helper.print_text_information('No wireless interfaces have been selected.')
                 sys.exit(0)
             else:
-                self.helper.print_text_warning('\nInvalid selection. Please, use only comma-separated numbers.')
+                print()
+                self.helper.print_text_warning('Invalid selection. Please, use only comma-separated numbers.')
                 sys.exit(0)
         else:
-            self.helper.print_text_information('\nNo wireless interfaces have been found.')
+            print()
+            self.helper.print_text_information('No wireless interfaces have been found.')
             sys.exit(0)
 
     def query_interfaces_and_store_data(self):
