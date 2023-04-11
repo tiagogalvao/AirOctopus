@@ -1,4 +1,5 @@
 import psutil
+import re
 import scapy.all as scapy
 
 from main.appOptions import AppOptions
@@ -30,12 +31,13 @@ class WifiInterface:
         self.MAC = scapy.get_if_hwaddr(name)
         self.MTU = interface_details.mtu
         self.Speed = interface_details.speed
-
         self.Module = self.os_utils.check_iface_module(name)
         self.Device = self.os_utils.check_iface_device(name)
+        self.DeviceOriginalName = self.Device
+        self.clean_device_name()
 
     def __str__(self):
-        return f'{self.Name} (Driver: {self.Module}  MAC: {self.MAC}  Device: {self.Device})'
+        return f'{self.Name} (Driver: {self.Module}  MAC: ...{self.MAC[9:len(self.MAC)]}  Device: {self.Device})'
 
     def disable_mode_monitor(self):
         self.ip_tool.set_iface_down(self.Name)
@@ -54,3 +56,14 @@ class WifiInterface:
             self.iw_tool.enable_mode_monitor(self.Name)
         self.ip_tool.set_iface_up(self.Name)
         self.InModeMonitor = True
+
+    def clean_device_name(self):
+        # TODO: This is ugly... please... make it better
+        trash_words = ['wireless', 'adapter', 'network', 'controller']
+        trash_normal = ['802.11', 'a/', '/ac', 'b/', 'g/', 'n/', ' n', 'network', 'controller', ':']
+        for item in trash_normal:
+            self.Device = self.Device.replace(item, '')
+        for item in trash_words:
+            pattern = re.compile(r'\b(' + str(item) + r')\b', flags=re.IGNORECASE)
+            self.Device = pattern.sub('', self.Device)
+        self.Device = self.Device.strip()

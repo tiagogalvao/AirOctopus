@@ -39,11 +39,55 @@ class OsUtils:
         return output.replace('../', '').replace('\n', '').split('/')[-1]
 
     def check_iface_device(self, iface: str):
+        iface_id = self.check_iface_usb_device(iface)
+        if self.helper.string_equals_ignore_case('unknown', iface_id):
+            iface_id = self.check_iface_pci_device(iface)
+        return iface_id
+
+    def check_iface_usb_device(self, iface: str):
+        iface_id = self.check_iface_usb_id(iface)
+        command = ['lsusb']
+        output = self.helper.execute_command_with_result(command)
+        regex_pattern = r'^.*\bID\s+' + str(iface_id) + r'\s+(.*)$'
+        has_interface = re.search(regex_pattern, output, re.MULTILINE)
+        if has_interface:
+            name = has_interface.group(1).strip()
+        else:
+            name = 'Unknown'
+        return name
+
+    def check_iface_pci_device(self, iface: str):
+        iface_id = self.check_iface_pci_id(iface)
+        command = ['lspci']
+        output = self.helper.execute_command_with_result(command)
+        regex_pattern = r'^.*' + str(iface_id) + r'\s+(.*)$'
+        has_interface = re.search(regex_pattern, output, re.MULTILINE)
+        if has_interface:
+            name = has_interface.group(1).strip()
+        else:
+            name = 'Unknown'
+        return name
+
+    def check_iface_usb_id(self, iface: str):
         command = ['cat', f'/sys/class/net/{iface}/device/uevent']
         output = self.helper.execute_command_with_result(command)
         has_product = re.search(r'^PRODUCT=(.*)$', output, re.MULTILINE)
         if has_product:
             product = has_product.group(1)
+            product = product.split('/')
+            product_id = f"{product[0].zfill(4)}:{product[1].zfill(4)}"
         else:
-            product = 'Unknown'
-        return product
+            product_id = 'Unknown'
+        return product_id
+
+    def check_iface_pci_id(self, iface: str):
+        command = ['cat', f'/sys/class/net/{iface}/device/uevent']
+        output = self.helper.execute_command_with_result(command)
+        has_product = re.search(r'^PCI_SLOT_NAME=(.*)$', output, re.MULTILINE)
+        if has_product:
+            product = has_product.group(1)
+            product = product.split(':')
+            product_id = f"{product[1]}:{product[2]}"
+        else:
+            product_id = 'Unknown'
+        return product_id
