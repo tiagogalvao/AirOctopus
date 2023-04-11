@@ -16,10 +16,13 @@ class Helper:
         subprocess.run(command)
 
     def execute_command_with_result(self, command):
-        if self.app_options.is_verbose:
-            separator = ' '
-            self.print_text_verbose_command(separator.join(command))
-        return subprocess.check_output(command, stderr=subprocess.DEVNULL, universal_newlines=True)
+        try:
+            if self.app_options.is_verbose:
+                separator = ' '
+                self.print_text_verbose_command(separator.join(command))
+            return subprocess.check_output(command, stderr=subprocess.DEVNULL, universal_newlines=True)
+        except subprocess.CalledProcessError:
+            return 'Error'
 
     def __print_text(self, *text):
         separator = ' '

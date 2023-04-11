@@ -1,5 +1,6 @@
 import os
 import platform
+import re
 import sys
 
 from main.appSettings import AppSettings
@@ -31,3 +32,18 @@ class OsUtils:
             self.helper.print_text('You will be asked for a password when privileges are needed.\n')
         else:
             self.helper.print_text("You don't need to run this as root ;)\n")
+
+    def check_iface_module(self, iface: str):
+        command = ['ls', '-l', f'/sys/class/net/{iface}/device/driver']
+        output = self.helper.execute_command_with_result(command)
+        return output.replace('../', '').replace('\n', '').split('/')[-1]
+
+    def check_iface_device(self, iface: str):
+        command = ['cat', f'/sys/class/net/{iface}/device/uevent']
+        output = self.helper.execute_command_with_result(command)
+        has_product = re.search(r'^PRODUCT=(.*)$', output, re.MULTILINE)
+        if has_product:
+            product = has_product.group(1)
+        else:
+            product = 'Unknown'
+        return product
