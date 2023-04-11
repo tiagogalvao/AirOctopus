@@ -75,14 +75,16 @@ class AirOctopus:
                               f', using comma-separated input: ')
             if re.match(r'^[\d,]+$', selection):
                 numbers = [int(x) for x in selection.split(',')]
+                numbers = list(set(numbers))
                 for n in numbers:
-                    if n < len(self.app_context.iface_system_wifi_interfaces):
+                    if 0 < n < len(self.app_context.iface_system_wifi_interfaces):
                         self.app_context.iface_selected_wifi_interfaces\
                             .append(self.app_context.iface_system_wifi_interfaces[n-1])
-            elif len(selection) < 1:
-                print()
-                self.helper.print_text_information('No wireless interfaces have been selected.')
-                sys.exit(0)
+
+                if len(self.app_context.iface_selected_wifi_interfaces) < 1:
+                    print()
+                    self.helper.print_text_information('No wireless interfaces have been selected.')
+                    sys.exit(0)
             else:
                 print()
                 self.helper.print_text_warning('Invalid selection. Please, use only comma-separated numbers.')
