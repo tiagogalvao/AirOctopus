@@ -1,6 +1,5 @@
 import psutil
 import re
-import scapy.all as scapy
 
 from main.appOptions import AppOptions
 from tools.ipTool import IpTool
@@ -26,9 +25,10 @@ class WifiInterface:
 
         # Properties
         self.Name = name
+        self.MAC = None
+        self.get_mac_address()
         self.Flags = interface_details[4]
         self.InModeMonitor = False
-        self.MAC = scapy.get_if_hwaddr(name)
         self.MTU = interface_details.mtu
         self.Speed = interface_details.speed
         self.Module = self.os_utils.check_iface_module(name)
@@ -67,3 +67,12 @@ class WifiInterface:
             pattern = re.compile(r'\b(' + str(item) + r')\b', flags=re.IGNORECASE)
             self.Device = pattern.sub('', self.Device)
         self.Device = self.Device.strip()
+
+    def get_mac_address(self):
+        output = self.ip_tool.get_mac_address(self.Name)
+        mac_address_regex = r"([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})"
+        match = re.search(mac_address_regex, output)
+        if match:
+            self.MAC = match.group(0)
+        else:
+            self.MAC = '00:00:00:00:00:00'

@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 import atexit
+import time
+
 import click
 import re
 import sys
 
+import main.network
 from main.appContext import AppContext
 from main.appOptions import AppOptions
 from main.appSettings import AppSettings
 from main.wifiInterface import WifiInterface
 from tools import ipTool, iwTool, iwconfigTool
+from ui.networksTable import NetworksTable
 from util.helper import Helper
 from util.osUtils import OsUtils
 
@@ -30,6 +34,7 @@ class AirOctopus:
         self.iwconfig_tool = iwconfigTool.IwconfigTool(self.helper)
 
         # Utils initialization
+        self.ui_networks = NetworksTable(self.app_context, self.helper)
         self.os_utils = OsUtils(self.app_context, self.app_settings, self.helper)
 
     def start(self):
@@ -43,12 +48,20 @@ class AirOctopus:
             if len(self.app_context.iface_selected_wifi_interfaces) > 0:
                 for iface in self.app_context.iface_selected_wifi_interfaces:
                     iface.enable_mode_monitor()
+
+            print('\n\n')
+            while True:
+                self.ui_networks.print()
+                network = main.network.Network(self.helper)
+                self.app_context.network_list.append(network)
+                time.sleep(1)
+
         except KeyboardInterrupt:
             print('\n')
             self.helper.print_text_warning(self.app_settings.app_name, 'has been aborted.')
         except Exception as e:
             print('')
-            if not self.app_options.is_verbose:
+            if self.app_options.is_verbose:
                 self.helper.print_text_error(e)
         finally:
             print('')
@@ -67,7 +80,8 @@ class AirOctopus:
     def print_interface_selection(self):
         self.query_interfaces_and_store_data()
         if len(self.app_context.iface_system_wifi_interfaces) > 0:
-            self.helper.print_text('\nAvailable interfaces:')
+            print('')
+            self.helper.print_text('Available interfaces:')
             for index, item in enumerate(self.app_context.iface_system_wifi_interfaces):
                 self.helper.print_text(f'{index+1}: {item}')
 
@@ -77,13 +91,13 @@ class AirOctopus:
                 numbers = [int(x) for x in selection.split(',')]
                 numbers = list(set(numbers))
                 for n in numbers:
-                    if 0 < n < len(self.app_context.iface_system_wifi_interfaces):
+                    if n > 0 and n <= len(self.app_context.iface_system_wifi_interfaces):
                         self.app_context.iface_selected_wifi_interfaces\
                             .append(self.app_context.iface_system_wifi_interfaces[n-1])
 
                 if len(self.app_context.iface_selected_wifi_interfaces) < 1:
                     print()
-                    self.helper.print_text_information('No wireless interfaces have been selected.')
+                    self.helper.print_text_information('No valid wireless interfaces have been selected.')
                     sys.exit(0)
             else:
                 print()
@@ -126,7 +140,6 @@ def run_app(keep_monitor, use_iwconfig, verbose):
     options.is_verbose = verbose
     options.iface_keep_monitor = keep_monitor
     options.use_iwconfig = use_iwconfig
-
     octopus = AirOctopus(options)
     octopus.start()
 
