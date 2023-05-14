@@ -1,11 +1,12 @@
 import os
-import inspect
 import platform
 import re
 import sys
 
-from main.appContext import AppContext
-from main.appSettings import AppSettings
+from elevate import elevate
+
+from internals.appContext import AppContext
+from internals.appSettings import AppSettings
 from util.helper import Helper
 
 
@@ -30,11 +31,7 @@ class OsUtils:
             sys.exit(0)
 
     def check_privileges(self):
-        if os.geteuid() != 0:
-            self.helper.print_text('Information:', self.app_settings.app_name, 'is not running as root. Good.')
-            self.helper.print_text('You will be asked for a password when privileges are needed.\n')
-        else:
-            self.helper.print_text("You don't need to run this as root ;)\n")
+        return os.geteuid()
 
     def preload_system_data(self):
         self.app_context.output_lspci = self.helper.execute_command_with_result(['lspci'])

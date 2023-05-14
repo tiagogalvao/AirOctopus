@@ -1,17 +1,18 @@
 import psutil
 import re
 
-from main.appOptions import AppOptions
+from internals.appOptions import AppOptions
 from tools.ipTool import IpTool
 from tools.iwconfigTool import IwconfigTool
 from tools.iwTool import IwTool
+from tools.iwlistTool import IwlistTool
 from util.helper import Helper
 from util.osUtils import OsUtils
 
 
 class WifiInterface:
     def __init__(self, name: str, options: AppOptions, helper: Helper, utils: OsUtils,
-                 ip_tool: IpTool, iw_tool: IwTool, iwconfig_tool: IwconfigTool):
+                 ip_tool: IpTool, iw_tool: IwTool, iwconfig_tool: IwconfigTool, iwlist_tool: IwlistTool):
         # Inject
         self.app_options = options
         self.helper = helper
@@ -19,6 +20,7 @@ class WifiInterface:
         self.ip_tool = ip_tool
         self.iw_tool = iw_tool
         self.iwconfig_tool = iwconfig_tool
+        self.iwlist_tool = iwlist_tool
 
         # Get details
         interface_details = psutil.net_if_stats()[name]
@@ -35,6 +37,7 @@ class WifiInterface:
         self.Device = self.os_utils.check_iface_device(name)
         self.DeviceOriginalName = self.Device
         self.clean_device_name()
+        self.Channels = self.iwlist_tool.check_channels(self.Name)
 
     def __str__(self):
         return f'{self.Name} (Driver: {self.Module}  MAC: ...{self.MAC[9:len(self.MAC)]}  Device: {self.Device})'
@@ -56,6 +59,12 @@ class WifiInterface:
             self.iw_tool.enable_mode_monitor(self.Name)
         self.ip_tool.set_iface_up(self.Name)
         self.InModeMonitor = True
+
+    def change_channel(self, channel: int):
+        if self.app_options.use_iwconfig:
+            self.iwconfig_tool.change_channel(self.Name, channel)
+        else:
+            self.iw_tool.change_channel(self.Name, channel)
 
     def clean_device_name(self):
         # TODO: This is ugly... please... make it better

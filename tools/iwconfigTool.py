@@ -7,6 +7,10 @@ class IwconfigTool:
     def __init__(self, helper: Helper):
         self.helper = helper
 
+    def change_channel(self, iface, channel: int):
+        command = ['sudo', 'iwconfig', iface, 'channel', channel]
+        self.helper.execute_command(command)
+
     def disable_mode_monitor(self, iface):
         command = ['sudo', 'iwconfig', iface, 'mode', 'managed']
         self.helper.execute_command(command)

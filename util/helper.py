@@ -1,7 +1,7 @@
 import subprocess
 
-from main.appOptions import AppOptions
-from main.appSettings import AppSettings
+from internals.appOptions import AppOptions
+from internals.appSettings import AppSettings
 
 
 class Helper:

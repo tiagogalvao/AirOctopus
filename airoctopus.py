@@ -3,15 +3,16 @@ import atexit
 import time
 
 import click
+import elevate
 import re
 import sys
 
-import main.network
-from main.appContext import AppContext
-from main.appOptions import AppOptions
-from main.appSettings import AppSettings
-from main.wifiInterface import WifiInterface
-from tools import ipTool, iwTool, iwconfigTool
+from internals.appContext import AppContext
+from internals.appOptions import AppOptions
+from internals.appSettings import AppSettings
+from main.wifiScanner import WiFiScanner
+from model.wifiInterface import WifiInterface
+from tools import ipTool, iwTool, iwconfigTool, iwlistTool
 from ui.networksTable import NetworksTable
 from util.helper import Helper
 from util.osUtils import OsUtils
@@ -32,6 +33,7 @@ class AirOctopus:
         self.ip_tool = ipTool.IpTool(self.helper)
         self.iw_tool = iwTool.IwTool(self.helper)
         self.iwconfig_tool = iwconfigTool.IwconfigTool(self.helper)
+        self.iwlist_tool = iwlistTool.IwlistTool(self.helper)
 
         # Utils initialization
         self.ui_networks = NetworksTable(self.app_context, self.helper)
@@ -39,9 +41,9 @@ class AirOctopus:
 
     def start(self):
         try:
+            elevate.elevate(graphical=False)
             self.print_leet_banner()
             self.os_utils.check_platform()
-            self.os_utils.check_privileges()
             self.os_utils.preload_system_data()
             self.print_interface_selection()
 
@@ -50,19 +52,27 @@ class AirOctopus:
                     iface.enable_mode_monitor()
 
             print('\n\n')
+            scanners = []
+            for item in self.app_context.iface_selected_wifi_interfaces:
+                scanner = WiFiScanner(self.app_context, self.helper, self.iwlist_tool, item, 0.5)
+                scanners.append(scanner)
+
             while True:
+                for item in scanners:
+                    item.start_scan()
+
                 self.ui_networks.print()
-                network = main.network.Network(self.helper)
-                self.app_context.network_list.append(network)
-                time.sleep(1)
+                # network = model.network.Network(self.helper)
+                # self.app_context.network_list.append(network)
+                time.sleep(0.5)
 
         except KeyboardInterrupt:
             print('\n')
             self.helper.print_text_warning(self.app_settings.app_name, 'has been aborted.')
-        except Exception as e:
-            print('')
-            if self.app_options.is_verbose:
-                self.helper.print_text_error(e)
+        # except Exception as e:
+        #     print('')
+        #     if self.app_options.is_verbose:
+        #         self.helper.print_text_error(e)
         finally:
             print('')
 
@@ -116,7 +126,7 @@ class AirOctopus:
 
         for interface in interfaces:
             iface = WifiInterface(interface, self.app_options, self.helper, self.os_utils,
-                                  self.ip_tool, self.iw_tool, self.iwconfig_tool)
+                                  self.ip_tool, self.iw_tool, self.iwconfig_tool, self.iwlist_tool)
             self.app_context.iface_system_wifi_interfaces.append(iface)
 
     def exit_gracefully(self, signum=None, frame=None):

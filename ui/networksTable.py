@@ -1,6 +1,6 @@
 from colorama import Cursor
 
-from main.appContext import AppContext
+from internals.appContext import AppContext
 from util.helper import Helper
 
 
@@ -12,7 +12,7 @@ class NetworksTable:
 
     def print(self):
         print(f'{Cursor.UP(1)}\033[J')
-        table_len = len(self.app_context.network_list)+1
+        table_len = len(self.app_context.network_list)+2
         if len(self.app_context.network_list) > 0:
             print(Cursor.UP(table_len))
             self.print_header()
