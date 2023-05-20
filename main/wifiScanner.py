@@ -11,11 +11,12 @@ from util.helper import Helper
 
 
 class WiFiScanner:
-    def __init__(self, context: AppContext, helper: Helper, iwlisttool: IwlistTool, interface: WifiInterface, timeout=5.0):
+    def __init__(self, context: AppContext, helper: Helper, iwlist_tool: IwlistTool,
+                 interface: WifiInterface, timeout=5.0):
         self.app_context = context
         self.helper = helper
         self.interface = interface
-        self.iwlisttool = iwlisttool
+        self.iwlist_tool = iwlist_tool
         self.timeout = timeout
         self.results = []
 

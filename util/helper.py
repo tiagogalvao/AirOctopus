@@ -9,15 +9,15 @@ class Helper:
         self.app_settings = settings
         self.app_options = options
 
-    def execute_command(self, command):
-        if self.app_options.is_verbose:
+    def execute_command(self, command, verbose_min_level: int):
+        if self.app_options.is_verbose and self.app_options.verbosity_level >= verbose_min_level:
             separator = ' '
             self.print_text_verbose_command(separator.join(command))
         subprocess.run(command)
 
-    def execute_command_with_result(self, command):
+    def execute_command_with_result(self, command, verbose_min_level: int):
         try:
-            if self.app_options.is_verbose:
+            if self.app_options.is_verbose and self.app_options.verbosity_level >= verbose_min_level:
                 separator = ' '
                 self.print_text_verbose_command(separator.join(command))
             return subprocess.check_output(command, stderr=subprocess.DEVNULL, universal_newlines=True)

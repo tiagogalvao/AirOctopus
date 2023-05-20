@@ -3,8 +3,6 @@ import platform
 import re
 import sys
 
-from elevate import elevate
-
 from internals.appContext import AppContext
 from internals.appSettings import AppSettings
 from util.helper import Helper
@@ -30,21 +28,22 @@ class OsUtils:
             self.helper.print_text('Unknown operating system detected. Bye.')
             sys.exit(0)
 
-    def check_privileges(self):
+    @staticmethod
+    def check_privileges():
         return os.geteuid()
 
     def preload_system_data(self):
-        self.app_context.output_lspci = self.helper.execute_command_with_result(['lspci'])
-        self.app_context.output_lsusb = self.helper.execute_command_with_result(['lsusb'])
+        self.app_context.output_lspci = self.helper.execute_command_with_result(['lspci'], 1)
+        self.app_context.output_lsusb = self.helper.execute_command_with_result(['lsusb'], 1)
 
     def check_iface_module(self, iface: str):
         command = ['ls', '-l', f'/sys/class/net/{iface}/device/driver']
-        output = self.helper.execute_command_with_result(command)
+        output = self.helper.execute_command_with_result(command, 1)
         return output.replace('../', '').replace('\n', '').split('/')[-1]
 
     def check_iface_device(self, iface: str):
         command = ['cat', f'/sys/class/net/{iface}/device/uevent']
-        output = self.helper.execute_command_with_result(command)
+        output = self.helper.execute_command_with_result(command, 1)
         iface_id = self.check_iface_usb_device(output)
         if self.helper.string_equals_ignore_case('unknown', iface_id):
             iface_id = self.check_iface_pci_device(output)
@@ -70,7 +69,8 @@ class OsUtils:
             name = 'Unknown'
         return name
 
-    def check_iface_usb_id(self, output):
+    @staticmethod
+    def check_iface_usb_id(output):
         has_product = re.search(r'^PRODUCT=(.*)$', output, re.MULTILINE)
         if has_product:
             product = has_product.group(1)
@@ -80,7 +80,8 @@ class OsUtils:
             product_id = 'Unknown'
         return product_id
 
-    def check_iface_pci_id(self, output):
+    @staticmethod
+    def check_iface_pci_id(output):
         has_product = re.search(r'^PCI_SLOT_NAME=(.*)$', output, re.MULTILINE)
         if has_product:
             product = has_product.group(1)

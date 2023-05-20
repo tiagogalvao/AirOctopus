@@ -54,7 +54,7 @@ class AirOctopus:
             print('\n\n')
             scanners = []
             for item in self.app_context.iface_selected_wifi_interfaces:
-                scanner = WiFiScanner(self.app_context, self.helper, self.iwlist_tool, item, 0.5)
+                scanner = WiFiScanner(self.app_context, self.helper, self.iwlist_tool, item, 0.1)
                 scanners.append(scanner)
 
             while True:
@@ -144,10 +144,12 @@ class AirOctopus:
 @click.command()
 @click.option('--keep-monitor', is_flag=True, help='Keep interfaces in monitor-mode after quitting')
 @click.option('--use-iwconfig', is_flag=True, help='Force the use of iwconfig instead of iw')
-@click.option('--verbose', '-v', is_flag=True, help='Enable verbose mode')
+@click.option('--verbose', '-v', count=True, help="Enable verbose mode. "
+                                                  "When using -vv (or more), will increase the verbosity level")
 def run_app(keep_monitor, use_iwconfig, verbose):
     options = AppOptions()
-    options.is_verbose = verbose
+    options.is_verbose = verbose > 0
+    options.verbosity_level = verbose
     options.iface_keep_monitor = keep_monitor
     options.use_iwconfig = use_iwconfig
     octopus = AirOctopus(options)
