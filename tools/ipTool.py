@@ -1,9 +1,11 @@
+from tools.base_tool import BaseTool
 from util.helper import Helper
 
 
-class IpTool:
+class IpTool(BaseTool):
     def __init__(self, helper: Helper):
         self.helper = helper
+        self.assembly_name = 'ip'
 
     def set_iface_up(self, iface):
         command = ['sudo', 'ip', 'link', 'set', iface, 'up']

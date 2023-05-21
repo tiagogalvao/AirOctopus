@@ -12,7 +12,7 @@ from internals.appOptions import AppOptions
 from internals.appSettings import AppSettings
 from main.wifiScanner import WiFiScanner
 from model.wifiInterface import WifiInterface
-from tools import ipTool, iwTool, iwconfigTool, iwlistTool
+from tools import dependency_check, ipTool, iwTool, iwconfigTool, iwlistTool
 from ui.networksTable import NetworksTable
 from util.helper import Helper
 from util.osUtils import OsUtils
@@ -34,6 +34,12 @@ class AirOctopus:
         self.iw_tool = iwTool.IwTool(self.helper)
         self.iwconfig_tool = iwconfigTool.IwconfigTool(self.helper)
         self.iwlist_tool = iwlistTool.IwlistTool(self.helper)
+        self.depcheck = dependency_check.DependencyCheck(
+            self.ip_tool, self.iwconfig_tool, self.iwlist_tool, self.iw_tool)
+
+        # Check all deps
+        self.depcheck.check_all()
+        time.sleep(1)
 
         # Utils initialization
         self.ui_networks = NetworksTable(self.app_context, self.helper)

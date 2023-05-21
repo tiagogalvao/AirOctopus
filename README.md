@@ -1,4 +1,4 @@
-# Projekt: Air Octopus - v.0.2.0
+# Projekt: Air Octopus - v.0.2.1
 
 Under development. Will be ready before 2045.
 

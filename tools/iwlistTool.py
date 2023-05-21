@@ -1,11 +1,13 @@
 import re
 
+from tools.base_tool import BaseTool
 from util.helper import Helper
 
 
-class IwlistTool:
+class IwlistTool(BaseTool):
     def __init__(self, helper: Helper):
         self.helper = helper
+        self.assembly_name = 'iwlist'
 
     def check_channels(self, iface):
         command = ['sudo', 'iwlist', iface, 'channel']

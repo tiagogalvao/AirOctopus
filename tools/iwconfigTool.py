@@ -1,11 +1,13 @@
 import re
 
+from tools.base_tool import BaseTool
 from util.helper import Helper
 
 
-class IwconfigTool:
+class IwconfigTool(BaseTool):
     def __init__(self, helper: Helper):
         self.helper = helper
+        self.assembly_name = 'iwconfig'
 
     def change_channel(self, iface, channel: int):
         command = ['sudo', 'iwconfig', iface, 'channel', channel]
