@@ -1,11 +1,14 @@
 import subprocess
 
+from colorama import Cursor
 from internals.appOptions import AppOptions
 from internals.appSettings import AppSettings
+from internals.appContext import AppContext
 
 
 class Helper:
-    def __init__(self, options: AppOptions, settings: AppSettings):
+    def __init__(self, context: AppContext, options: AppOptions, settings: AppSettings):
+        self.app_context = context
         self.app_settings = settings
         self.app_options = options
 
@@ -24,6 +27,11 @@ class Helper:
         except subprocess.CalledProcessError:
             return 'Error'
 
+    def move_cursor(self, amount: int):
+        self.app_context.cursor_location += amount
+        print(f'{Cursor.UP(self.app_context.cursor_location)}\033[J')
+        self.app_context.cursor_location = 1
+
     def __print_text(self, *text):
         separator = ' '
         text = separator.join([word for word in text if word is not None])
@@ -34,6 +42,11 @@ class Helper:
     def print_text(self, *text):
         result = prepare_text(text)
         self.__print_text(f' {result}')
+        self.app_context.cursor_location += 1
+
+    def print_text_ignore_counter(self, *text):
+        self.print_text(text)
+        self.app_context.cursor_location += prepare_text(text).splitlines()
 
     def print_text_verbose_command(self, *command):
         result = prepare_text(command)

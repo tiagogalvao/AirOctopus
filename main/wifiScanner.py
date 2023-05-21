@@ -21,7 +21,6 @@ class WiFiScanner:
         self.results = []
 
     def start_scan(self):
-
         self._scan_channel()
 
     def _scan_channel(self):

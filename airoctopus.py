@@ -27,7 +27,7 @@ class AirOctopus:
         self.app_context = AppContext()
         self.app_options = options
         self.app_settings = AppSettings()
-        self.helper = Helper(self.app_options, self.app_settings)
+        self.helper = Helper(self.app_context, self.app_options, self.app_settings)
 
         # Tools initialization
         self.ip_tool = ipTool.IpTool(self.helper)
@@ -62,9 +62,7 @@ class AirOctopus:
                     item.start_scan()
 
                 self.ui_networks.print()
-                # network = model.network.Network(self.helper)
-                # self.app_context.network_list.append(network)
-                time.sleep(0.5)
+                time.sleep(0.1)
 
         except KeyboardInterrupt:
             print('\n')
@@ -83,7 +81,8 @@ class AirOctopus:
         banner += "     / _ \\ | | '__| | | |/ __| __/ _ \\| '_ \\| | | / __|\n"
         banner += '    / ___ \\| | |  | |_| | (__| || (_) | |_) | |_| \\__ \\\n'
         banner += '   /_/   \\_\\_|_|   \\___/ \\___|\\__\\___/| .__/ \\__,_|___/\n'
-        banner += '                                      |_|              \n'
+        banner += '                                      | |              \n'
+        banner += f'                                      |_|  v.{self.app_settings.app_version}'
         banner += '\n\n'
         self.helper.print_text(banner)
 
@@ -95,6 +94,7 @@ class AirOctopus:
             for index, item in enumerate(self.app_context.iface_system_wifi_interfaces):
                 self.helper.print_text(f'{index+1}: {item}')
 
+            self.app_context.cursor_location = 0
             selection = input(f'\n  Select from [1-{len(self.app_context.iface_system_wifi_interfaces)}]'
                               f', using comma-separated input: ')
             if re.match(r'^[\d,]+$', selection):

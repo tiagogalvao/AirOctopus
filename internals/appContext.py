@@ -10,3 +10,5 @@ class AppContext:
 
     output_lsusb = None
     output_lspci = None
+
+    cursor_location = 1

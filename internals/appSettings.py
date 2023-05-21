@@ -7,7 +7,7 @@ import colorama
 class AppSettings:
     # BASIC INFO
     app_name = 'AirOctopus'
-    app_version = '0.2.0'
+    app_version = '0.2.1'
 
     # FONT STYLING
     fs_black = colorama.Fore.LIGHTBLACK_EX
