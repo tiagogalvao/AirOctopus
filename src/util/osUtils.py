@@ -3,9 +3,9 @@ import platform
 import re
 import sys
 
-from internals.appContext import AppContext
-from internals.appSettings import AppSettings
-from util.helper import Helper
+from src.internals.appContext import AppContext
+from src.internals.appSettings import AppSettings
+from src.util.helper import Helper
 
 
 class OsUtils:

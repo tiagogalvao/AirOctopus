@@ -1,9 +1,9 @@
 import subprocess
 
 from colorama import Cursor
-from internals.appOptions import AppOptions
-from internals.appSettings import AppSettings
-from internals.appContext import AppContext
+from src.internals.appOptions import AppOptions
+from src.internals.appSettings import AppSettings
+from src.internals.appContext import AppContext
 
 
 class Helper:

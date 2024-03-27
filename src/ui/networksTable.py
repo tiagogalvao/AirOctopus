@@ -1,5 +1,5 @@
-from internals.appContext import AppContext
-from util.helper import Helper
+from src.internals.appContext import AppContext
+from src.util.helper import Helper
 
 
 class NetworksTable:

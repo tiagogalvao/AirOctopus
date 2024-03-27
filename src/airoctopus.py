@@ -7,11 +7,11 @@ import elevate
 import re
 import sys
 
-from internals.appContext import AppContext
-from internals.appOptions import AppOptions
-from internals.appSettings import AppSettings
-from main.wifiScanner import WiFiScanner
-from model.wifiInterface import WifiInterface
+from src.internals.appContext import AppContext
+from src.internals.appOptions import AppOptions
+from src.internals.appSettings import AppSettings
+from src.main.wifiScanner import WiFiScanner
+from src.model.wifiInterface import WifiInterface
 from tools import dependency_check, ipTool, iwTool, iwconfigTool, iwlistTool
 from ui.networksTable import NetworksTable
 from util.helper import Helper
