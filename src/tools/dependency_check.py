@@ -1,7 +1,7 @@
-from src.tools.ipTool import IpTool
-from src.tools.iwlistTool import IwlistTool
-from src.tools.iwTool import IwTool
-from src.tools.iwconfigTool import IwconfigTool
+from tools.ipTool import IpTool
+from tools.iwlistTool import IwlistTool
+from tools.iwTool import IwTool
+from tools.iwconfigTool import IwconfigTool
 
 
 class DependencyCheck:

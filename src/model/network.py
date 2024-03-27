@@ -1,4 +1,4 @@
-from src.util.helper import Helper
+from util.helper import Helper
 
 
 class Network:

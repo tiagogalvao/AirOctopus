@@ -1,13 +1,13 @@
 import psutil
 import re
 
-from src.internals.appOptions import AppOptions
-from src.tools.ipTool import IpTool
-from src.tools.iwconfigTool import IwconfigTool
-from src.tools.iwTool import IwTool
-from src.tools.iwlistTool import IwlistTool
-from src.util.helper import Helper
-from src.util.osUtils import OsUtils
+from internals.appOptions import AppOptions
+from tools.ipTool import IpTool
+from tools.iwconfigTool import IwconfigTool
+from tools.iwTool import IwTool
+from tools.iwlistTool import IwlistTool
+from util.helper import Helper
+from util.osUtils import OsUtils
 
 
 class WifiInterface:
