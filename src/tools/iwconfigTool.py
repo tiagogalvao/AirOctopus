@@ -1,7 +1,7 @@
 import re
 
-from tools.base_tool import BaseTool
-from util.helper import Helper
+from src.tools.base_tool import BaseTool
+from src.util.helper import Helper
 
 
 class IwconfigTool(BaseTool):

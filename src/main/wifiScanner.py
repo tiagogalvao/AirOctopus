@@ -3,11 +3,11 @@ import random
 
 from scapy.layers.dot11 import Dot11Beacon, Dot11Elt
 
-from internals.appContext import AppContext
-from model.network import Network
-from model.wifiInterface import WifiInterface
-from tools.iwlistTool import IwlistTool
-from util.helper import Helper
+from src.internals.appContext import AppContext
+from src.model.network import Network
+from src.model.wifiInterface import WifiInterface
+from src.tools.iwlistTool import IwlistTool
+from src.util.helper import Helper
 
 
 class WiFiScanner:
