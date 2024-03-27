@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import atexit
 import time
-
 import click
 import elevate
 import re

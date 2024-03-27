@@ -1,0 +1,6 @@
+click
+setuptools
+colorama
+psutil
+scapy
+elevate
